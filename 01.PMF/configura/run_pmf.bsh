@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+gmx grompp -f min.mdp -o min -pp min -po min -maxwarn 10
+gmx mdrun -v -deffnm min
+
+gmx grompp -f min2.mdp -o min2 -pp min2 -po min2 -c min -t min   -maxwarn 10
+gmx mdrun -v -deffnm min2
+
+gmx grompp -f eql.mdp -o eql -pp eql -po eql -c min2 -t min2     -maxwarn 10
+gmx mdrun -v -deffnm eql
+
+gmx grompp -f eql2.mdp -o eql2 -pp eql2 -po eql2 -c eql -t eql    -maxwarn 10
+gmx mdrun -v -deffnm eql2
+
+gmx grompp -f prd.mdp -o prd -pp prd -po prd -c eql2 -t eql2      -maxwarn 10
+gmx mdrun -v -deffnm prd

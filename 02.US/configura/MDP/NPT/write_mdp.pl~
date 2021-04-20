@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+use strict;
+#对于模拟, 我们将使用perl脚本替换.mdp文件中的WINDOW关键字
+
+# 打开一个通用的.mdp文件，并替换以下值
+#'WINDOW'，增量为1。
+
+unless (@ARGV) {
+    die "Usage: $0 input.mdp\n";
+}
+
+my $mdp = $ARGV[0];
+
+my @temp = split('\.', $mdp);
+my $base = $temp[0];
+
+open(IN, "<$mdp");
+my @in = <IN>;
+close(IN);
+
+# #26个窗口, 距离从0.05 nm到大约1.3 nm.既WINDOW有26个值，增量为0.05
+for (my $i=0; $i<27; $i++) {
+
+    my $filename = "${base}_${i}.mdp";
+
+    open(OUT, ">$filename");
+
+    foreach $_ (@in) {
+        unless ($_ =~ /^WINDOW/) {
+            print OUT $_;
+        }
+
+        if ($_ =~ /^WINDOW\s*=/) {
+            printf OUT "%s %d\n", $&, 0.05*($i+1);
+        }
+    }
+
+    close(OUT);
+
+}
+
+exit;

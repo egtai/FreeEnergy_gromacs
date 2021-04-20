@@ -1,0 +1,72 @@
+
+integrator               = md        
+dt                       = 0.002     ; 2 fs
+nsteps                   = 2500000   ; 5.0 ns
+
+nstenergy                = 5000
+nstlog                   = 5000
+nstxout-compressed       = 2000
+
+continuation             = yes
+constraint-algorithm     = lincs
+constraints              = h-bonds
+
+cutoff-scheme            = Verlet
+
+coulombtype              = PME
+rcoulomb                 = 1.0
+
+vdwtype                  = Cut-off
+rvdw                     = 1.0
+DispCorr                 = EnerPres
+
+tcoupl                   = Nose-Hoover
+tc-grps                  = System
+tau-t                    = 2.0
+ref-t                    = 298.15
+nhchainlength            = 1
+
+pcoupl                   = Parrinello-Rahman 
+tau_p                    = 2.0
+compressibility          = 4.46e-5
+ref_p                    = 1.0 
+
+
+;{ US采样代码：质心牵引
+;===============================================================================
+pull                  = Yes ; Yes/No  使用牵引代码
+pull-ngroups          = 2   ; 牵引组数目,这里是CA和CB两个
+pull-ncoords          = 1   ; 牵引坐标数目
+pull-group1-name      = CA ; 牵引组名称, 来自top或ndx；.对我们来说,
+                      ; 这是其中一个甲烷的碳, 尽管我们也可以选择整个甲烷.
+                      ;如果那样做的话, 就会沿着两个甲烷分子的质心方向进行牵引
+pull-group2-name      = CB         ;另一个甲烷的碳原子
+pull-coord1-type      = umbrella
+                      ; umbrella:简谐势
+                      ; constraint:刚性约束
+                      ; constant-force:恒力, 无须pull-init和pull-rate
+pull-coord1-geometry  = distance
+                      ; distance:沿质心间的矢量, 用pull-dim选择分量
+                      ; direction:沿pull-vec方向
+                      ; direction-periodic:同direction, 但距离可超过盒长一半. 使用时盒子在牵引方向不能变化
+                      ; cylinder:圆柱
+
+pull-coord1-groups    = 1 2   ; 对此坐标牵引的两个组(定义见后面). 实际上你可以定义                                   
+                      ;更多的牵引坐标, 也可以在不同的分子组之间进行牵引, 但我们在这里不使用这些选项
+                      
+pull-coord1-rate      = 0.0   ; 速率(nm/ps)
+                      ;我们不需要两个组沿坐标方向运动, 因此设置为零
+                      
+pull-coord1-k         = 5000.0   ; 力常数(kJ/mol-nm^2)
+pull-coord1-init      = 0.85     ; 零时刻的基准距离,这是个变量
+                      ;两个组的初始间距. 这是关键字, 我将使用bash脚本将其替换为每个窗口的相应值
+pull-coord1-start     = no   ; No:不修改pull-init; Yes:将初始构型的质心距离添加到pull-init       
+                      ;我们手动指定每个窗口的距离, 因此计算时不需要考虑质心距离
+;}==============================================================================
+
+
+
+
+
+
+
